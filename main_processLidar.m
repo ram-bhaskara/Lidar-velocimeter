@@ -44,7 +44,8 @@ Q = cameraDCM(lookFrom, lookAt, up)
 pointCloudinSensorFrame('wall_t1t3_01.txt', lookFrom, lookAt, up);
 
 %% TRAJECTORY / SENSOR DATA
-filename = 'traj4_test1_ref'; % trajectory raw data
+addpath('H:\Research\Image_processing\velocimeter_HIL\pointclouds_raw\Davis_datasets');
+filename = 'rocket_spin_pt5_2'; % trajectory raw data
 pc_data = AevaPcRead(filename);
 %%
-makeLiDARVideo(pc_data);
+makeLiDARVideo2(pc_data);
