@@ -4,7 +4,8 @@
 
 clc; clear; close all; 
 
-Aeva_dataset = 'H:\Research\Image_processing\velocimeter_HIL\pointclouds_raw';
+% data path
+Aeva_dataset = 'C:\Users\brc06\Research\imageProcessing\Lidar_HIL\data';
 addpath(genpath(Aeva_dataset));
 %% READ Aeva point_cloud data
 filename = 'traj1_test3_int'; % trajectory raw data
