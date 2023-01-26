@@ -46,7 +46,7 @@ comass = [mean(x_body(~isnan(x_body))), mean(y_body(~isnan(y_body))), ...
 Q = cameraDCM(lookFrom, lookAt, up)
 %%
 
-pointCloudinSensorFrame('wall_t1t3_55_3D.txt', lookFrom, lookAt, up);
+pointCloudinSensorFrame('wall_t1t3_00_3D.txt', lookFrom, lookAt, up);
 
 %% TRAJECTORY / SENSOR DATA
 addpath('H:\Research\Image_processing\velocimeter_HIL\pointclouds_raw\Davis_datasets');

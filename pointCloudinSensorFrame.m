@@ -37,10 +37,15 @@ t_r = R_r * ([0 0 0]' - lookFrom);
     xlabel('X'); ylabel('Y'); zlabel('Z');
     title('Point cloud in body-frame | NaRPA')
     axis equal
+    grid on
+    xlim([-2 2])
+    ylim([-2 5])
+    zlim([0 2])
 
     subplot(2,1,2)
     plot3(xs, ys, zs,'.','MarkerSize',0.5);
     xlabel('X'); ylabel('Y'); zlabel('Z');
     title('Point cloud in sensor-frame | NaRPA')
     axis equal
+    grid on
 end

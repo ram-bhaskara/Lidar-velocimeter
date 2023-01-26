@@ -39,41 +39,22 @@ points = stlData.Points;
 ptCloud = pointCloud(points); 
 
 %% YAW check 
-
-% C_B2L =   [-0.0277    0.9903    0.1363
-%    -0.9993   -0.0311    0.0229
-%     0.0269   -0.1356    0.9904];
-
 figure
-pcshow(ptCloud, 'BackgroundColor',[1 1 1])
-hold on
+% pcshow(ptCloud)
+% hold on
 
-
-for ii = 1:25:length(quat_data)
-% transformation = se3(quat_as_DCM(quat_data(ii,:)), T_V2L(ii,:)); 
-% h = plot(transformation); 
-plot3(T_V2L(ii,1), T_V2L(ii,2), T_V2L(ii,3), '.k', "MarkerSize", 20);
-h = plotTransforms(T_V2L(ii,:), [quat_data(ii,4) quat_data(ii,1) quat_data(ii,2) quat_data(ii,3)], "FrameAxisLabels","on", "FrameSize",0.75);
-
-% h = plotTransforms(transformation, "FrameAxisLabels","off", "FrameSize",0.75);
+for ii = 1:length(quat_data)
+transformation = se3(quat_as_DCM(quat_data(ii,:)), T_V2L(ii,:)); 
+h = plot(transformation); 
+% plotTransforms(T_V2L(ii,:), quat_data(ii,:), "FrameAxisLabels","on");
 pause(0.01);
-axis on; xlabel('X'); ylabel('Y'); zlabel('Z')
-% xlim([-5 5])
-% ylim([-5 5])
-% zlim([-5 5])
-hold all
-% set(h,'Visible','off')
-% delete(h);
+xlim([-10 10])
+ylim([-10 10])
+zlim([-10 10])
+% delete(ax_tf);
 end
 
-plot3(T_V2L(:,1), T_V2L(:,2), T_V2L(:,3), 'k', "LineWidth", 2);
-% 
 % hold off
-
-
-%% NARPA renders
-
-pc_sensor = pointCloudinSensorFrame("wall_t1t3_00_3D.txt", zeros(3,1), zeros(3,1), zeros(3,1));
 
 
 %% To sensor frame
@@ -195,14 +176,3 @@ pcshow(ptCloud_ICP);
 axis on; xlabel('X'); ylabel('Y'); zlabel('Z');
 title("ICP Transformed frame")
 
-
-%%
-function p = IMU2LIDAR(p_b)
-    p_B2L = [0.0094 0.0625 0.1213]';
-    C_B2L =   [-0.0277    0.9903    0.1363
-   -0.9993   -0.0311    0.0229
-    0.0269   -0.1356    0.9904];
-    
-    p = C_B2L * p_b + p_B2L;
-
-end
