@@ -73,7 +73,7 @@ plot3(T_V2L(:,1), T_V2L(:,2), T_V2L(:,3), 'k', "LineWidth", 2);
 
 %% NARPA renders
 
-pc_sensor = pointCloudinSensorFrame("wall_t1t3_00_3D.txt", zeros(3,1), zeros(3,1), zeros(3,1));
+pc_sensor = pointCloudinSensorFrame("wall_t1t3_55_3D.txt", zeros(3,1), zeros(3,1), zeros(3,1));
 
 
 %% To sensor frame
