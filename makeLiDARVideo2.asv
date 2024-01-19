@@ -1,16 +1,18 @@
-function makeLiDARVideo(pc_data, data_path)
+function makeLiDARVideo2(pc_data)
 
-    % PARAMETERS FOR FOR TRAJ4_TEST1
+% PARAMETERS FOR FOR TRAJ4_TEST1 
 
-    % myWriter = VideoWriter('Aeva_t4t1_PointScans', 'MPEG-4');
-myWriter = VideoWriter(strcat(data_path, '/', 'spinningSatellite'), 'Motion JPEG AVI');
+% myWriter = VideoWriter('Aeva_t4t1_PointScans','MPEG-4');
+% myWriter = VideoWriter('Aeva_t4t1_velMap','MPEG-4');
 myWriter.Quality = 100;
 myWriter.FrameRate = 10;
 open(myWriter);
 
 Ncol = 1000; % RESOLUTION
 
-for INPUT_FRAME = 1:15
+gMin=Inf; gMax = -Inf;
+
+for INPUT_FRAME = 1:150
 
     pc_temp = pointCloud(double(pc_data(INPUT_FRAME).xyz'));
 %     roi = [0 4.5 -1.2 0.02*(INPUT_FRAME-69) -2 2];
@@ -28,8 +30,34 @@ for INPUT_FRAME = 1:15
     myVar = vel;
 %%
     minVar = min(myVar); maxVar = max(myVar);
+    if maxVar > gMax
+        gMax = maxVar; 
+    end
+ 
+     if minVar < gMin
+        gMin = minVar; 
+     end
+end
+
+
+
+for INPUT_FRAME = 1:5
+
+    pc_temp = pointCloud(double(pc_data(INPUT_FRAME).xyz'));
+    roi = [0 5 -2 2 -1 1];
+    i_roi = findPointsInROI(pc_temp,roi);
+    pc_select = select(pc_temp,i_roi);
+   
+    myX = pc_select.Location(:,1); myY = pc_select.Location(:,2);
+    myZ = pc_select.Location(:,3); 
+    
+    vel = pc_data(INPUT_FRAME).velocity; 
+    vel = vel(i_roi); 
+    myVar = vel;
+%%
     intensity = myVar + (-1)*minVar; 
-    intensity = (intensity./max(intensity,[],'all'))*Ncol; 
+%     intensity = (intensity./max(intensity,[],'all'))*Ncol; 
+    intensity = (intensity./gMax)*Ncol; 
     
     figure
     subplot(2,1,1)
@@ -40,7 +68,7 @@ for INPUT_FRAME = 1:15
     axis equal
     view([-110,20])
     colorbar
-    caxis([minVar maxVar])
+    caxis([gMin gMax])
 %     % set(gcf, 'InvertHardCopy', 'off'); 
 %     % set(gca, 'color', 'k');
 
@@ -48,9 +76,9 @@ for INPUT_FRAME = 1:15
     subplot(2,1,2)
     histogram(myVar)
     title('Velocity Histogram'); xlabel('Velocity'); ylabel('Points'); 
-    drawnow;
-    writeVideo(myWriter,getframe(gcf));
-    delete(pcPlot);
+%     drawnow;
+%     writeVideo(myWriter,getframe(gcf));
+%     delete(pcPlot);
 end
  close(myWriter);
 end

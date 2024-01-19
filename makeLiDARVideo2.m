@@ -1,12 +1,13 @@
-function makeLiDARVideo2(pc_data)
+function makeLiDARVideo2(pc_data, data_path)
 
-% PARAMETERS FOR FOR TRAJ4_TEST1 
+    % PARAMETERS FOR FOR TRAJ4_TEST1
 
-% myWriter = VideoWriter('Aeva_t4t1_PointScans','MPEG-4');
+    % myWriter = VideoWriter('Aeva_t4t1_PointScans', 'MPEG-4');
 % myWriter = VideoWriter('Aeva_t4t1_velMap','MPEG-4');
-% myWriter.Quality = 100;
-% myWriter.FrameRate = 10;
-% open(myWriter);
+myWriter = VideoWriter(strcat(data_path, '/', 'spinningSatellite'), 'Motion JPEG AVI');
+myWriter.Quality = 100;
+myWriter.FrameRate = 10;
+open(myWriter);
 
 Ncol = 1000; % RESOLUTION
 
@@ -73,12 +74,13 @@ for INPUT_FRAME = 1:5
 %     % set(gca, 'color', 'k');
 
     %% Histogram of velocities
-    subplot(2,1,2)
+ subplot(2,1,2)
     histogram(myVar)
     title('Velocity Histogram'); xlabel('Velocity'); ylabel('Points'); 
-%     drawnow;
-%     writeVideo(myWriter,getframe(gcf));
+    drawnow;
+    writeVideo(myWriter,getframe(gcf));
 %     delete(pcPlot);
+    close gcf;
 end
  close(myWriter);
 end
