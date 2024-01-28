@@ -6,19 +6,22 @@ clc;
 clear;
 close all;
 
-cd '/home/ram/PhD/imageProcessing/velocimetry_HIL/software_ram/Lidar-velocimeter'
+% cd '/home/ram/PhD/imageProcessing/velocimetry_HIL/software_ram/Lidar-velocimeter'
+cd('H:\Research\Image_processing\velocimeter_HIL\Lidar-velocimeter');
+addpath(genpath('.\reconstruction\'));
 %%
 % data path % 
 % Aeva_dataset = 'C:\Users\brc06\Research\imageProcessing\Lidar_HIL\data';
-Aeva_dataset = '/home/ram/PhD/imageProcessing/velocimetry_HIL/data';
+Aeva_dataset = 'H:\Research\Image_processing\velocimeter_HIL\pointclouds_raw\Davis_datasets\';
 addpath(genpath(Aeva_dataset));
+
 % % READ Aeva point_cloud data % 
 % filename = 'traj4_test3_ref';
 % % trajectory raw data % 
 % pc_data = AevaPcRead(filename);
 % % %
 % 
-%  pc_data_rocket = AevaPcRead('rocket_spin_pt5_2');
+ pc_data_rocket = AevaPcRead('rocket_spin_pt5_2');
 
 
 % datapath ='carla-town04-straight-walls/point_clouds/';
@@ -29,7 +32,7 @@ addpath(genpath(Aeva_dataset));
 pc_data = load('trn_ekf_HOMER_pc_data_raw.mat');
 pc_data = pc_data.pc_data; 
  %%
- saveAs = "homer_trn";
+%  saveAs = "homer_trn";
  trn_truth = load("trn_ekf_HOMER_truth.mat");
 %  AevaPcRecord_AstWall(pc_data, Aeva_dataset, saveAs); 
 %%

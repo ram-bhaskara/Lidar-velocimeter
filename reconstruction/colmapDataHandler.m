@@ -1,14 +1,14 @@
-clc; close; clear; 
+% clc; close; clear; 
 
 % 1. Plotting the trajectory of cameras in the scene
 % 2. Setting up the trajectory for NaRPA data handling
 
 % Working Directory
-cd('/home/ram/PhD/imageProcessing/velocimetry_HIL/software_ram/Lidar-velocimeter/reconstruction'); 
+% cd('/home/ram/PhD/imageProcessing/velocimetry_HIL/software_ram/Lidar-velocimeter/reconstruction'); 
 
 % Path of colmap output products (cameras.txt, images.txt, points3D.txt files)
-dataPath = '/home/ram/PhD/imageProcessing/velocimetry_HIL/data/spinningRocket/colmap2/sparse/0/'; 
-
+% dataPath = '/home/ram/PhD/imageProcessing/velocimetry_HIL/data/spinningRocket/colmap2/sparse/0/'; 
+dataPath = [pwd '\reconstruction\']; 
 [cameras, images, points3D] = read_model(dataPath); 
 %%
 [xyz, xyzColors, camera_centers, view_dirs] = plot_model(cameras, images, points3D); 
@@ -21,8 +21,8 @@ ptFused = pointCloud(xyz);
 
 figure 
 % Point Cloud
-pcFileName = 'fused.ply'; 
-% 'spinningRocket.ply';
+% pcFileName = 'fused.ply'; 
+pcFileName = '\cleanedSpinningRocket.ply';
 ptCloud = pcread([dataPath pcFileName]);  
 % Edited pointcloud from MeshLab
 % Does not correspond with the points3d.txt
@@ -30,14 +30,16 @@ ptCloud = pcread([dataPath pcFileName]);
 pcshow(ptCloud); 
 axis on;  
 hold on;
-extrinsics = images.values;
 
-for ii = 1:5:numel(extrinsics)
+extrinsics = images.values;
+h = plotTransforms(([0 0 0]), rotm2quat(eye(3)), "FrameSize",1);
+
+for ii = 1:10:numel(extrinsics)
     rotm = extrinsics{ii}.R;
     trnsl = extrinsics{ii}.t;
     % rotm takes from world to camera; rotm' -> camera to world
     % https://colmap.github.io/format.html#images-txt
-h = plotTransforms(transpose(-rotm'*trnsl), rotm2quat(rotm'), "FrameAxisLabels","on", "FrameSize",0.3);
+h = plotTransforms(transpose(-rotm'*trnsl), rotm2quat(rotm'), "FrameSize",0.3);
 pause(0.1);
 end
 xlabel('X'); ylabel('Y'); zlabel('Z');
@@ -58,7 +60,7 @@ disp(translations - camera_centers); % -> correct
 
 %% NARPA Meta Data Preparation
 
-lookFroms = camera_centers;
+lookFroms = camera_centers; % translations
 lookAts = zeros(length(lookFroms), 3);
 ups = lookAts;
 
@@ -68,5 +70,62 @@ for i = 1:length(lookFroms)
     lookAts(i,:) = camera_centers(i,:)' + rotm' * [0; 0; 0.3]; % vector along camera +z-axis
     ups(i,:) = rotm' * [0; 1; 0]; % verify cross products
     % https://stackoverflow.com/questions/3427379/effective-way-to-calculate-the-up-vector-for-glulookat-which-points-up-the-y-axi
-    
 end
+
+%% Verification of camera matrix
+DCM_camera = cameraDCM( lookFroms(1,:), lookAts(1,:), ups(1,:) )
+%% Data Association Problem
+% Associate Colmap indexed images with the cropped image data
+keys = images.keys;
+for ii = 1:images.Count
+   fprintf('CamID: %d \t ImgID: %d \t Img: %s\n', images(keys{ii}).camera_id, images(keys{ii}).image_id, images(keys{ii}).name);
+end
+%% SORT the images and save point clouds at each camera instance
+% Correct ID
+% Animate the point cloud and compare
+% Operating on 101 images
+timeDiff = 0.1; % Time between consecutive frames
+timeInstances = 0.0:timeDiff:100*timeDiff;
+velocitiesApprox = zeros(101,3);
+for ii = 1:100
+    velocitiesApprox(ii+1,:) = (lookFroms(ii+1,:)-lookFroms(ii,:))./timeDiff;
+end
+
+plot(timeInstances, velocitiesApprox(:,1), timeInstances, velocitiesApprox(:,2), timeInstances, velocitiesApprox(:,3));
+legend('V_x', 'V_y', 'V_z');
+xlabel('time'); ylabel('velocities m/s'); title('Linear velocities');
+%% Coarse angular velocity estimation
+angularVelocities = zeros(101, 3);
+
+for ii = 1:100
+    rotm_i = extrinsics{ii}.R;
+    rotm_i1 = extrinsics{ii+1}.R;
+    quat_i = rotm2quat(rotm_i');
+    quat_i1 = rotm2quat(rotm_i1');
+    
+    deltaQuaternion = quatmultiply( quat_i1,  quatconj(quat_i) );
+    
+    % Convert quaternion to axis-angle representation
+    axang = quat2axang(deltaQuaternion);
+    principleAxis = axang(1:3); principleAngle = axang(4);
+     % Estimate angular velocity vector
+    angularVelocities(ii+1, :) = (principleAxis * principleAngle) / timeDiff;
+end
+plot(timeInstances, angularVelocities(:,1), timeInstances, angularVelocities(:,2), timeInstances, angularVelocities(:,3));
+legend('W_x', 'W_y', 'W_z');
+xlabel('time'); ylabel('velocities rad/s'); title('Angular velocities');
+%% File Write
+VelFileID = fopen('Velocity.txt','w');
+TrajFileID = fopen('Trajectory.txt', 'w'); 
+LookAtFileID = fopen('LookAt.txt', 'w'); 
+UpFileID = fopen('updata.txt', 'w'); 
+
+for ii = 1:101
+ fprintf(VelFileID,'%f \t %f \t %f\n', velocitiesApprox(ii,1), velocitiesApprox(ii,2), velocitiesApprox(ii,3));
+ fprintf(TrajFileID,'%f \t %f \t %f\n', lookFroms(ii,1), lookFroms(ii,2), lookFroms(ii,3));
+ fprintf(LookAtFileID,'%f \t %f \t %f\n', 0, 0, 0);
+ fprintf(UpFileID,'%f \t %f \t %f\n', 0, 1, 0);
+end 
+
+fclose(VelFileID);
+fclose(TrajFileID); fclose(LookAtFileID); fclose(UpFileID);
