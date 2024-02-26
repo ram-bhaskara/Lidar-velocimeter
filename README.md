@@ -1,11 +1,15 @@
 # Development and Validation of Velocimeter LIDAR Simulator
-Calibrating point clouds and velocimetry from a FMCW Lidar sensor against simulations from a rendering software.
+### Calibrating point clouds and velocimetry from a FMCW Lidar sensor against synthetic data generated from our rendering software. <br />
+#### Ramchander Bhaskara, Roshan Eapen, Manoranjan Majji
+--- 
+_Status_ (Feb 2024): Lidar simulation validated with hardware. Statistically agreements/disagreements between rendered and real-data are reported (results below, paper to follow). Poster presented at AAS GNC 2024 conference, Breckenridge, CO. Available upon request.
+<br />
 
-_Status_ (Jan 2024): Lidar simulation validated with hardware. Statistically agreements/disagreements between rendered and real-data are reported (results below, paper to follow). 
+_Coming up_: File cleanup. 
 
-_Process_: We collect FMCW datasets from real-world scenes using Aeva 4D Lidar (example). We collect the ground truth trajectory information (poses, velocities) using vicon system. 3D assets are generated from dense reconstruction of the real-world scene with elaborating filtering methods. We simulate the physics of the FMCW Lidar using a custom ray-tracing software built at [LASR laboratory](https://lasr.tamu.edu/). Ultimately, we compare the statistically similarities between the rendered and the sensor outputs. 
+_Process_: We collect FMCW datasets from real-world scenes using Aeva 4D Lidar (example). We also collect the ground truth trajectory information (poses, velocities) using vicon system. 3D assets are generated from dense reconstruction of the real-world scene. We simulate the physics of the FMCW Lidar using a custom ray-tracing software built at [LASR laboratory](https://lasr.tamu.edu/). Ultimately, we compare the statistically similarities between the rendered and the sensor outputs. 
 
-_Note_: We used two datasets (shown below) to validate our results. Datasets and rendering softwares are not public yet. Reach out to [me](bhaskara@tamu.edu) for details. 
+_Note_: We used two datasets (shown below) to validate our results: asteroid wall (landing approach) and spinning satellite (proximity ops). Datasets and rendering softwares are not public. Reach out to [me](bhaskara@tamu.edu) for details. 
 
 
 ## Results
