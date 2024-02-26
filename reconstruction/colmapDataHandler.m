@@ -8,7 +8,7 @@
 
 % Path of colmap output products (cameras.txt, images.txt, points3D.txt files)
 % dataPath = '/home/ram/PhD/imageProcessing/velocimetry_HIL/data/spinningRocket/colmap2/sparse/0/'; 
-dataPath = [pwd '\reconstruction\']; 
+% dataPath = [pwd '\reconstruction\']; 
 [cameras, images, points3D] = read_model(dataPath); 
 %%
 [xyz, xyzColors, camera_centers, view_dirs] = plot_model(cameras, images, points3D); 
@@ -22,7 +22,7 @@ ptFused = pointCloud(xyz);
 figure 
 % Point Cloud
 % pcFileName = 'fused.ply'; 
-pcFileName = '\cleanedSpinningRocket.ply';
+pcFileName = '\spinningRocket.ply';
 ptCloud = pcread([dataPath pcFileName]);  
 % Edited pointcloud from MeshLab
 % Does not correspond with the points3d.txt
@@ -32,21 +32,25 @@ axis on;
 hold on;
 
 extrinsics = images.values;
-h = plotTransforms(([0 0 0]), rotm2quat(eye(3)), "FrameSize",1);
+h = plotTransforms(([0 0 0]), rotm2quat(eye(3)), "FrameSize", 1.25);
 
-for ii = 1:10:numel(extrinsics)
+for ii = 1:7:70
     rotm = extrinsics{ii}.R;
     trnsl = extrinsics{ii}.t;
     % rotm takes from world to camera; rotm' -> camera to world
     % https://colmap.github.io/format.html#images-txt
-h = plotTransforms(transpose(-rotm'*trnsl), rotm2quat(rotm'), "FrameSize",0.3);
+h = plotTransforms(transpose(-rotm'*trnsl), rotm2quat(rotm'), "FrameSize",0.6);
 pause(0.1);
 end
-xlabel('X'); ylabel('Y'); zlabel('Z');
+xlabel('X'); ylabel('Y'); zlabel('Z'); axis off; 
 hold off
 
 view([180 90])
+ax = gca;
+ax.LineWidth = 16;
 
+% set(gcf, 'InvertHardCopy', 'off'); 
+% set(gcf,'Color',[0 0 0]); % RGB values [0 0 0] indicates black color
 %% Verification
 translations = zeros(numel(extrinsics),3); 
 
@@ -91,9 +95,14 @@ for ii = 1:100
     velocitiesApprox(ii+1,:) = (lookFroms(ii+1,:)-lookFroms(ii,:))./timeDiff;
 end
 
-plot(timeInstances, velocitiesApprox(:,1), timeInstances, velocitiesApprox(:,2), timeInstances, velocitiesApprox(:,3));
-legend('V_x', 'V_y', 'V_z');
-xlabel('time'); ylabel('velocities m/s'); title('Linear velocities');
+plot(timeInstances(2:end), velocitiesApprox(2:end,1), 'r', timeInstances(2:end), velocitiesApprox(2:end,2),'b', timeInstances(2:end), velocitiesApprox(2:end,3), 'k', ...
+    'LineWidth', 2.5);
+legend('$v_x$', '$v_y$', '$v_z$', 'Interpreter', 'latex', 'FontSize', 16);
+xlabel('t', 'Interpreter', 'latex'); ylabel('$\mathbf{v}$', 'Interpreter', 'latex'); title('Linear velocities (m/s)', 'Interpreter', 'latex');
+ax = gca; 
+ax.FontSize = 14;
+ax.LineWidth = 2.5;
+xlim([timeInstances(2) timeInstances(end)]); axis equal;
 %% Coarse angular velocity estimation
 angularVelocities = zeros(101, 3);
 
@@ -111,9 +120,14 @@ for ii = 1:100
      % Estimate angular velocity vector
     angularVelocities(ii+1, :) = (principleAxis * principleAngle) / timeDiff;
 end
-plot(timeInstances, angularVelocities(:,1), timeInstances, angularVelocities(:,2), timeInstances, angularVelocities(:,3));
-legend('W_x', 'W_y', 'W_z');
-xlabel('time'); ylabel('velocities rad/s'); title('Angular velocities');
+plot(timeInstances(2:end), angularVelocities(2:end,1), 'r',timeInstances(2:end), angularVelocities(2:end,2),'b', timeInstances(2:end), angularVelocities(2:end,3),'k', ...
+    'LineWidth', 2.5);
+legend('$\omega_x$', '$\omega_y$', '$\omega_z$', 'Interpreter', 'latex', 'FontSize', 16);
+xlabel('t', 'Interpreter', 'latex'); ylabel('\boldmath{$\omega$}', 'Interpreter', 'latex'); title('Angular velocities (rad/s)', 'Interpreter', 'latex');
+ax = gca; 
+ax.FontSize = 14;
+ax.LineWidth = 2.5;
+xlim([timeInstances(2) timeInstances(end)]); axis tight;
 %% File Write
 VelFileID = fopen('Velocity.txt','w');
 TrajFileID = fopen('Trajectory.txt', 'w'); 

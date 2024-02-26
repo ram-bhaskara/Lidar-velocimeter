@@ -2,10 +2,10 @@
 % RR Bhaskara
 % Texas A&M University
 
-clc; clear; close all; 
+% clc; clear; close all; 
 
 % data path
-Aeva_dataset = 'C:\Users\brc06\Research\imageProcessing\Lidar_HIL\data';
+Aeva_dataset = 'H:\Research\Image_processing\velocimeter_HIL\pointclouds_raw\';
 % Aeva_dataset = 'C:\Users\brc06\Research\imageProcessing\Lidar_HIL\data\terrain';
 addpath(genpath(Aeva_dataset));
 
@@ -45,7 +45,7 @@ ptCloud = pointCloud(points);
 %     0.0269   -0.1356    0.9904];
 
 figure
-pcshow(ptCloud, 'BackgroundColor',[1 1 1])
+pcshow(ptCloud, 'MarkerSize', 25)
 hold on
 
 
@@ -53,11 +53,11 @@ for ii = 1:25:length(quat_data)
 % transformation = se3(quat_as_DCM(quat_data(ii,:)), T_V2L(ii,:)); 
 % h = plot(transformation); 
 plot3(T_V2L(ii,1), T_V2L(ii,2), T_V2L(ii,3), '.k', "MarkerSize", 20);
-h = plotTransforms(T_V2L(ii,:), [quat_data(ii,4) quat_data(ii,1) quat_data(ii,2) quat_data(ii,3)], "FrameAxisLabels","on", "FrameSize",0.75);
+h = plotTransforms(T_V2L(ii,:), [quat_data(ii,4) quat_data(ii,1) quat_data(ii,2) quat_data(ii,3)], "FrameSize",0.75);
 
 % h = plotTransforms(transformation, "FrameAxisLabels","off", "FrameSize",0.75);
 pause(0.01);
-axis on; xlabel('X'); ylabel('Y'); zlabel('Z')
+axis on; xlabel('X', 'interpreter', 'Latex'); ylabel('Y', 'interpreter', 'Latex'); zlabel('Z', 'interpreter', 'Latex'); grid off;
 % xlim([-5 5])
 % ylim([-5 5])
 % zlim([-5 5])
@@ -69,7 +69,15 @@ end
 plot3(T_V2L(:,1), T_V2L(:,2), T_V2L(:,3), 'k', "LineWidth", 2);
 % 
 % hold off
-
+ax = gca; 
+ax.FontSize = 14;
+ax.LineWidth = 2.5;
+ax.ZAxis.Visible = 'off';
+ax.ZGrid = 'off';
+title('\textbf{Vehicle trajectory in vicon frame} $\mathcal{V}$', 'interpreter', 'Latex', 'fontweight','bold', 'fontsize',18);
+% set(gcf, 'InvertHardCopy', 'off'); 
+% set(gcf,'Color',[1 1 1]); % RGB values [0 0 0] indicates black color
+set(gca, 'XColor', [0 0 0], 'YColor', [0 0 0], 'ZColor', [0.15 0.15 0.15])
 
 %% NARPA renders
 
