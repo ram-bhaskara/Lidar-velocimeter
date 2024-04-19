@@ -50,16 +50,6 @@ If you use our software/approach/analysis in a scientific publication, we would 
   journal={arXiv preprint arXiv:2211.01566},
   year={2022}
 }
-
-@software{Lidar_velocimeter_validation,
-  author = {Ramchander Bhaskara, Manoranjan Majji},
-  doi = {},
-  month = {1},
-  title = {{My Research Software}},
-  url = {https://github.com/ram-bhaskara/Lidar-velocimeter},
-  version = {1.0.0},
-  year = {2024}
-}
 ```
 
 ## License
